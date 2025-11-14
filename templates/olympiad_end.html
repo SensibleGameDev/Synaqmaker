@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Результаты олимпиады{% endblock %}
+{% block content %}
+<div class="text-center">
+    <h1 class="display-4">Таблица результатов</h1>
+    {% if results.status != 'finished' %}
+        <p class="lead text-warning">Олимпиада еще не завершена! Это предварительные результаты.</p>
+    {% else %}
+        <p class="lead text-success">Олимпиада завершена!</p>
+    {% endif %}
+</div>
+<hr>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h4>Итоговая таблица (ID: {{ olympiad_id }})</h4>
+            </div>
+            <div class="card-body">
+                
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Никнейм</th>
+                            <th scope="col">Организация</th>
+                            {% set letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %} 
+                            {% for task in tasks %}
+                                <th scope="col" class="text-center">Задача {{ letters[loop.index0] }}</th>
+                            {% endfor %}
+                            
+                            {% if results.config.scoring == 'icpc' %}
+                                <th scope="col" class="text-center">Решено</th>
+                                <th scope="col" class="text-center">Штраф</th>
+                            {% else %}
+                                <th scope="col" class="text-center">Итог</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in participants_list %}
+                        
+                            {% if player.disqualified %}
+                            <tr class="table-danger">
+                                <th scope="row">{{ loop.index }}</th>
+                                <td><del><strong>{{ player.nickname }}</strong></del></td>
+                                <td><del>{{ player.organization or '' }}</del></td>
+                            {% else %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td><strong>{{ player.nickname }}</strong></td>
+                                <td>{{ player.organization or '' }}</td>
+                            {% endif %}
+
+                            {% for task in tasks %}
+                                {% set score_info = player.scores.get(task[0]|string, {'score': 0, 'attempts': 0, 'passed': False, 'penalty': 0}) %}
+                                
+                                <td class="text-center 
+                                    {% if score_info.passed %}table-success
+                                    {% elif results.config.scoring == 'icpc' and score_info.attempts > 0 %}table-danger
+                                    {% endif %}">
+                                    
+                                    {% if results.config.scoring == 'icpc' %}
+                                        {% if score_info.passed %}
+                                            +{{ score_info.attempts if score_info.attempts > 0 else '' }}
+                                            <small class="text-muted">({{ score_info.penalty }})</small>
+                                        {% elif score_info.attempts > 0 %}
+                                            -{{ score_info.attempts }}
+                                        {% else %}
+                                            
+                                        {% endif %}
+                                    {% else %}
+                                        {{ score_info.score }}
+                                        <small class="text-muted">({{ score_info.attempts }})</small>
+                                    {% endif %}
+                                </td>
+                            {% endfor %} 
+                            
+                            {% if player.disqualified %}
+                                <td class="text-center" colspan="{% if results.config.scoring == 'icpc' %}2{% else %}1{% endif %}">
+                                    <strong><span class="badge bg-danger">Дисквалифицирован</span></strong>
+                                </td>
+                            {% else %}
+                                <td class="text-center"><strong>{{ player.total_score }}</strong></td>
+                                {% if results.config.scoring == 'icpc' %}
+                                    <td class="text-center"><strong>{{ player.total_penalty }}</strong></td>
+                                {% endif %}
+                            {% endif %}
+                            </tr>
+
+                        {% else %}
+                            <td colspan="{{ 4 + tasks|length + (1 if results.config.scoring == 'icpc' else 0) }}" class="text-center text-muted">Пока нет ни одного решения.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p class="text-muted mt-2"><small>
+                    {% if results.config.scoring == 'icpc' %}
+                        В скобках указано штрафное время (в минутах).
+                    {% else %}
+                        В скобках указано количество неверных попыток до зачета.
+                    {% endif %}
+                </small></p>
+            </div>
+        </div>
+        <div class="text-center mt-4">...</div>
+    </div>
+</div>
+{% endblock %}

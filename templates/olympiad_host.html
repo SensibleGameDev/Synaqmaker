@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+{% block title %}Панель организатора{% endblock %}
+
+{% block content %}
+<style>
+    /* Анимация мигания для "Pending" */
+    @keyframes flash-yellow {
+        0%, 100% { background-color: #ffffff; }
+        50% { background-color: #fff3cd; } 
+    }
+    .pending-flash {
+        animation: flash-yellow 1.5s infinite;
+    }
+
+    /* Анимация вспышки для "Success" */
+    @keyframes flash-green {
+        0% { background-color: #d1e7dd; }
+        100% { background-color: #cce7d8; } 
+    }
+    .flash-success {
+        animation: flash-green 1.5s ease-out;
+    }
+
+    /* Анимация вспышки для "Fail" */
+    @keyframes flash-red {
+        0% { background-color: #f8d7da; }
+        100% { background-color: #f8d7da; } 
+    }
+    .flash-fail {
+        animation: flash-red 1.5s ease-out;
+    }
+    
+    /* * СТИЛЬ ДЛЯ ПЛАВНОГО ПЕРЕМЕЩЕНИЯ (FLIP)
+    */
+    #scoreboard-body tr {
+        /* По умолчанию transition выключен. 
+          Мы будем добавлять его только для анимации.
+        */
+        transition: none;
+    }
+
+</style>
+
+
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Вы организатор!</h1>
+    <p class="lead">ID вашей олимпиады: <kbd class="fs-4">{{ olympiad_id }}</kbd></p>
+    <p class="lead">Режим: 
+        {% if oly_mode == 'closed' %}
+        <span class="badge bg-danger">Закрытый</span>
+        {% else %}
+        <span class="badge bg-success">Свободный</span>
+        {% endif %}
+    </p>
+    <h4 id="timer-block" class="d-none mt-3">Оставшееся время: <span id="timer" class="badge bg-secondary">00:00:00</span></h4>
+    <hr class="my-4">
+
+    <div id="start-section">
+        <p>Сообщите этот ID студентам. Когда все подключатся, нажмите "Начать олимпиаду".</p>
+        <button id="start-btn" class="btn btn-success btn-lg">Начать олимпиаду для всех!</button>
+    </div>
+
+    <div id="running-section" class="d-none">
+        <h3 class="text-success">Олимпиада запущена!</h3>
+        <p>Вы можете наблюдать за результатами или завершить соревнование для всех.</p>
+        <button id="finish-btn" class="btn btn-danger">Завершить олимпиаду для всех</button>
+        <a href="{{ url_for('olympiad_end', olympiad_id=olympiad_id) }}" class="btn btn-info">Посмотреть текущие результаты</a>
+    </div>
+</div>
+
+{% if oly_mode == 'closed' %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h4><i class="bi bi-person-lines-fill"></i> Управление участниками (Закрытый режим)</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-5">
+                <h5>Добавить вручную</h5>
+                <form action="{{ url_for('olympiad_add_participant', olympiad_id=olympiad_id) }}" method="POST">
+                    <div class="mb-2">
+                        <label class="form-label">Никнейм</label>
+                        <input type="text" name="nickname" class="form-control" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Организация (необязательно)</label>
+                        <input type="text" name="organization" class="form-control">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Пароль</label>
+                        <input type="text" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </form>
+                <hr class="my-4">
+                <h5>Импорт из Excel (.xlsx)</h5>
+                <p class="small text-muted">Шаблон: 1-я колонка - Никнейм, 2-я - Организация, 3-я - Пароль. (Без заголовков)</p>
+                <form action="{{ url_for('olympiad_upload_participants', olympiad_id=olympiad_id) }}" method="POST" enctype="multipart/form-data">
+                     <div class="mb-2">
+                         <input type="file" name="participant_file" class="form-control" accept=".xlsx,.xls" required>
+                     </div>
+                     <button type="submit" class="btn btn-success">Импортировать</button>
+                </form>
+            </div>
+            <div class="col-md-7">
+                <h5>"Белый список" ({{ whitelist|length }})</h5>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Никнейм</th>
+                                <th>Организация</th>
+                                <th>Статус</th>
+                                <th>Действие</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in whitelist %}
+                            <tr>
+                                <td>{{ p.nickname }}</td>
+                                <td>{{ p.organization }}</td>
+                                <td>
+                                    {% if p.id|string in olympiad_data.participants %}
+                                        <span class="badge bg-success">Вошел</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Ожидает</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('olympiad_remove_participant', olympiad_id=olympiad_id, participant_db_id=p.id) }}" method="POST" onsubmit="return confirm('Удалить этого участника?');">
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Удалить">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Список пуст</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="row mt-4">
+    <div class="col-md-4">
+        <h4>Подключенные участники:</h4>
+        <ul id="participants-list" class="list-group">
+            <li class="list-group-item">Ожидание подключений...</li>
+        </ul>
+    </div>
+    <div class="col-md-8">
+        <h4>Таблица результатов (Live):</h4>
+        <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Никнейм</th>
+                            <th>Организация</th>
+                            {% set letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+                                {% for task in tasks %}
+                                    <th class="text-center">Задача {{ letters[loop.index0] }}</th>
+                                {% endfor %}
+                            
+                            {% if olympiad_data.config.scoring == 'icpc' %}
+                                <th class="text-center">Решено</th>
+                                <th class="text-center">Штраф</th>
+                            {% else %}
+                                <th class="text-center">Итог</th>
+                            {% endif %}
+                            
+                            <th>Действия</th> </tr>
+                    </thead>
+                    <tbody id="scoreboard-body">
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    const olympiadId = "{{ olympiad_id }}";
+    const startSection = document.getElementById('start-section');
+    const runningSection = document.getElementById('running-section');
+    const timerBlock = document.getElementById('timer-block');
+    const timerEl = document.getElementById('timer');
+    
+    // Глобальная переменная для ID ячеек, которые анимируются
+    let animatedCells = new Set();
+
+    // --- ИСПРАВЛЕНИЕ ТАЙМЕРА (БАГ №1) ---
+    let timerInterval = null;
+
+    function startHostTimer(secondsLeft) {
+        // Если таймер уже идет, ничего не делаем (или можно сбросить, если рассинхрон большой)
+        if (timerInterval) clearInterval(timerInterval);
+
+        let timeLeft = Math.floor(secondsLeft);
+
+        function draw() {
+            if (timeLeft <= 0) {
+                timerEl.textContent = 'Время вышло!';
+                timerEl.classList.remove('bg-secondary');
+                timerEl.classList.add('bg-danger');
+                clearInterval(timerInterval);
+                return;
+            }
+            
+            const h = String(Math.floor(timeLeft / 3600)).padStart(2, '0');
+            const m = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
+            const s = String(timeLeft % 60).padStart(2, '0');
+            
+            timerEl.textContent = `${h}:${m}:${s}`;
+            timeLeft--;
+        }
+
+        draw(); // Отрисовать сразу
+        timerInterval = setInterval(draw, 1000);
+    }
+    // ------------------------------------
+
+    function updateHostView(data) {
+        try {
+            // 1. Обновляем статус и таймер
+            if (data.status === 'running' || data.status === 'finished') {
+                startSection.classList.add('d-none');
+                runningSection.classList.remove('d-none');
+                timerBlock.classList.remove('d-none');
+                
+                if (data.status === 'finished') {
+                    timerEl.textContent = "Завершено";
+                    timerEl.classList.add('bg-danger');
+                    if(timerInterval) clearInterval(timerInterval);
+                } else {
+                    // Берем секунды от сервера!
+                    startHostTimer(data.remaining_seconds);
+                }
+            }
+            
+            if (data.status === 'finished') {
+                const finishBtn = document.getElementById('finish-btn');
+                if(finishBtn) {
+                    finishBtn.disabled = true;
+                    finishBtn.textContent = 'Олимпиада завершена';
+                }
+            }
+
+            // 2. Обновляем список участников
+            const participantsList = document.getElementById('participants-list');
+            participantsList.innerHTML = '';
+            if (data.participants.length > 0) {
+                data.participants.forEach(name => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = name;
+                    participantsList.appendChild(li);
+                });
+            } else {
+                participantsList.innerHTML = '<li class="list-group-item">Пока никто не подключился</li>';
+            }
+
+            // --- 3. ОБНОВЛЕНИЕ ТАБЛИЦЫ РЕЗУЛЬТАТОВ (FLIP-АНИМАЦИЯ) ---
+            const scoreboardBody = document.getElementById('scoreboard-body');
+            const scoringMode = data.config.scoring;
+            // Важно: при рендере шаблона мы передали tasks, но в JS нам нужны ID.
+            // Используем trick с jinja, чтобы получить массив ID
+            const taskIds = [
+                {% for task in tasks %}
+                    {{ task[0] }},
+                {% endfor %}
+            ];
+            
+            // (FLIP: 1. First - запоминаем позиции)
+            const oldPositions = new Map();
+            for (const row of scoreboardBody.rows) {
+                if(row.dataset.participantId) {
+                    oldPositions.set(row.dataset.participantId, row.getBoundingClientRect().top);
+                }
+            }
+            
+            // Сортировка данных
+            if (scoringMode === 'icpc') {
+                data.scoreboard.sort((a, b) => {
+                    if (b.total_score !== a.total_score) return b.total_score - a.total_score;
+                    return a.total_penalty - b.total_penalty;
+                });
+            } else {
+                data.scoreboard.sort((a, b) => b.total_score - a.total_score);
+            }
+
+            const newPlayerIds = new Set(data.scoreboard.map(p => p.participant_id));
+
+            // Удаляем лишние строки
+            for (const row of scoreboardBody.rows) {
+                if (row.dataset.participantId && !newPlayerIds.has(row.dataset.participantId)) {
+                    row.remove();
+                }
+            }
+
+            // (FLIP: 2. Обновляем DOM)
+            data.scoreboard.forEach((player, index) => {
+                const playerId = player.participant_id;
+                let row = document.getElementById(`row-${playerId}`);
+                
+                if (!row) {
+                    row = scoreboardBody.insertRow();
+                    row.id = `row-${playerId}`;
+                    row.dataset.participantId = playerId;
+                }
+                
+                row.dataset.rank = index + 1;
+
+                // Ссылка для DQ
+                const dq_url = `/olympiad/host/${olympiadId}/disqualify/${player.participant_id}`;
+                const dq_form = `
+                    <form action="${dq_url}" method="POST" onsubmit="return confirm('Вы уверены?');" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" title="Дисквалифицировать">
+                            <i class="bi bi-x-octagon-fill"></i>
+                        </button>
+                    </form>
+                `;
+                
+                let rowHTML = `<th scope="row">${index + 1}</th>
+                               <td><strong>${player.nickname}</strong></td>
+                               <td>${player.organization || ''}</td>`;
+                
+                // Ячейки задач
+                taskIds.forEach(tid => {
+                    const scoreInfo = player.scores[String(tid)] || player.scores[tid]; // Защита от типов ключей
+                    const cellId = `cell-${playerId}-${tid}`;
+                    let cellClass = '';
+                    let cellContent = '0';
+
+                    if (scoreInfo) {
+                         if (scoringMode === 'icpc') {
+                            if (scoreInfo.passed) {
+                                cellClass = 'table-success';
+                                cellContent = `+${scoreInfo.attempts > 0 ? scoreInfo.attempts : ''} <small class="text-muted">(${scoreInfo.penalty})</small>`;
+                            } else if (scoreInfo.attempts > 0) {
+                                cellClass = 'table-danger';
+                                cellContent = `-${scoreInfo.attempts}`;
+                            } else {
+                                cellContent = `0`;
+                            }
+                        } else { 
+                            if (scoreInfo.passed) cellClass = 'table-success';
+                            cellContent = `${scoreInfo.score} <small class="text-muted">(${scoreInfo.attempts})</small>`;
+                        }
+                    }
+                    
+                    // Анимация вспышки при изменении
+                    const oldCell = document.getElementById(cellId);
+                    if (!animatedCells.has(cellId)) {
+                        if (oldCell) oldCell.classList.remove('pending-flash');
+                        
+                        // Сравниваем контент без тегов (грубо), чтобы понять, изменилось ли число
+                        if (oldCell && oldCell.innerHTML !== cellContent) {
+                            let animClass = '';
+                            if (cellClass === 'table-success') animClass = 'flash-success';
+                            else if (cellClass === 'table-danger') animClass = 'flash-fail';
+
+                            if (animClass) {
+                                // Трюк: добавляем класс к НОВОЙ ячейке после рендера, 
+                                // но так как мы переписываем innerHTML всей строки, сделаем это чуть позже или сразу в HTML
+                                // Проще добавить класс сразу в строку HTML, но тогда он будет всегда.
+                                // Поэтому используем data-атрибут или JS post-processing.
+                                // Для простоты: добавим класс прямо здесь, но он пропадет при следующем обновлении.
+                                cellClass += ` ${animClass}`;
+                            }
+                        }
+                    }
+                    
+                    rowHTML += `<td class="text-center ${cellClass}" id="${cellId}">${cellContent}</td>`;
+                });
+                
+                // Итоговые колонки
+                if (scoringMode === 'icpc') {
+                    rowHTML += `<td class="text-center"><strong>${player.total_score}</strong></td>`;
+                    rowHTML += `<td class="text-center"><strong>${player.total_penalty}</strong></td>`;
+                } else {
+                    rowHTML += `<td class="text-center"><strong>${player.total_score}</strong></td>`;
+                }
+                rowHTML += `<td>${dq_form}</td>`;
+                
+                row.innerHTML = rowHTML;
+            });
+            
+            // Сортировка строк в DOM
+            const sortedRows = Array.from(scoreboardBody.rows)
+                .sort((a, b) => {
+                    return parseInt(a.dataset.rank) - parseInt(b.dataset.rank);
+                });
+            
+            sortedRows.forEach(row => scoreboardBody.appendChild(row));
+
+            // (FLIP: 3. Invert & Play)
+            requestAnimationFrame(() => {
+                for (const row of sortedRows) {
+                    const id = row.dataset.participantId;
+                    const oldTop = oldPositions.get(id);
+                    if (oldTop === undefined) continue;
+                    
+                    const newTop = row.getBoundingClientRect().top;
+                    const deltaY = oldTop - newTop;
+
+                    if (deltaY !== 0) {
+                        row.style.transition = 'none';
+                        row.style.transform = `translateY(${deltaY}px)`;
+                        
+                        // Запускаем анимацию на следующем кадре
+                        requestAnimationFrame(() => {
+                             row.style.transition = 'transform 0.6s ease-in-out';
+                             row.style.transform = '';
+                        });
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error("Ошибка обновления Host View:", error);
+        }
+    }
+
+    const socket = io();
+
+    socket.on('connect', () => {
+        console.log('Socket.IO: Хост подключен.');
+        socket.emit('join_room', { room: olympiadId });
+    });
+
+    socket.on('full_status_update', (data) => {
+        updateHostView(data);
+    });
+
+    socket.on('submission_pending', (data) => {
+        const cellId = `cell-${data.participant_id}-${data.task_id}`;
+        const cell = document.getElementById(cellId);
+        if (cell) {
+            cell.classList.add('pending-flash');
+            animatedCells.add(cellId);
+            // Через 3 секунды убираем из сета, чтобы разрешить обновление
+            setTimeout(() => animatedCells.delete(cellId), 3000);
+        }
+    });
+
+    document.getElementById('start-btn').addEventListener('click', async () => {
+        if (!confirm('Начать олимпиаду?')) return;
+        await fetch(`/olympiad/start/${olympiadId}`, { method: 'POST' });
+        // Страница не перезагружается, ждем сокета
+    });
+
+    document.getElementById('finish-btn').addEventListener('click', async () => {
+        if (!confirm('Завершить для всех?')) return;
+        await fetch(`/olympiad/finish_by_host/${olympiadId}`, { method: 'POST' });
+        window.location.href = `{{ url_for('olympiad_end', olympiad_id=olympiad_id) }}`;
+    });
+</script>
+{% endblock %}

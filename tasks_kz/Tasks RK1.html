@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Задачи по программированию / Бағдарламалау есептері</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f9fafb; color: #111827; }
+    header { background: #2563eb; color: white; padding: 16px 24px; }
+    header h1 { margin: 0; font-size: 22px; }
+    nav { background: #f1f5f9; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; }
+    nav a { display: inline-block; margin-right: 16px; text-decoration: none; color: #2563eb; font-weight: 500; }
+    nav a:hover { text-decoration: underline; }
+    main { padding: 24px; max-width: 900px; margin: auto; }
+    section { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    h2 { margin-top: 0; color: #1e3a8a; }
+    pre { background: #f3f4f6; padding: 10px; border-radius: 6px; overflow-x: auto; }
+    code { font-family: Consolas, monospace; }
+    .meta { color: #4b5563; font-size: 14px; margin-bottom: 6px; }
+    footer { text-align: center; color: #6b7280; font-size: 13px; padding: 20px; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Набор задач / Есептер жинағы</h1>
+  </header>
+  <nav>
+    <a href="#task1">1. Сдвиг массива / Массивті жылжыту</a>
+    <a href="#task2">2. Отрезок простых / Жай сандар тізбегі</a>
+    <a href="#task3">3. Сокращение строки / Жолды қысқарту</a>
+  </nav>
+
+  <main>
+    <section id="task1">
+      <h2>1. Сдвиг массива / Массивті жылжыту</h2>
+      <p><strong>Русский:</strong> Дан целочисленный массив <code>A</code> длиной <code>n</code> и число <code>x</code>. Необходимо сдвинуть элементы массива на <code>x</code> шагов вправо. Если <code>x</code> отрицательно — сдвинуть влево. Сдвиг циклический (элементы не теряются).</p>
+      <p><strong>Қазақша:</strong> Бүтін сандардан тұратын <code>A</code> массиві мен <code>x</code> саны берілген. Массив элементтерін <code>x</code> қадамға оңға жылжытыңыз. Егер <code>x</code> теріс болса — солға жылжытыңыз. Жылжыту циклдік түрде орындалады.</p>
+
+      <p class="meta">Ограничения / Шектеулер: 1 ≤ n ≤ 10⁵, −10⁹ ≤ Aᵢ ≤ 10⁹, −10⁹ ≤ x ≤ 10⁹</p>
+
+      <h3>Формат ввода / Кіріс форматы</h3>
+      <pre><code>n x
+A₁ A₂ ... Aₙ</code></pre>
+
+      <h3>Формат вывода / Шығыс форматы</h3>
+      <pre><code>Сдвинутый массив / Жылжыған массив</code></pre>
+
+      <h3>Примеры / Мысалдар</h3>
+      <pre><strong>Input:</strong>
+5 2
+1 2 3 4 5
+
+<strong>Output:</strong>
+4 5 1 2 3</pre>
+
+      <pre><strong>Input:</strong>
+5 -1
+10 20 30 40 50
+
+<strong>Output:</strong>
+20 30 40 50 10</pre>
+    </section>
+
+    <section id="task2">
+      <h2>2. Самый длинный отрезок из простых чисел / Ең ұзын жай сандар тізбегі</h2>
+      <p><strong>Русский:</strong> Дан массив целых чисел длиной <code>n</code>. Найдите длину самого длинного непрерывного подотрезка, состоящего только из простых чисел. Если таких нет — выведите <code>0</code>.</p>
+      <p><strong>Қазақша:</strong> Ұзындығы <code>n</code> болатын бүтін сандар массиві берілген. Тек жай сандардан тұратын ең ұзын үздіксіз тізбектің ұзындығын табыңыз. Егер ондай жоқ болса — <code>0</code> шығарыңыз.</p>
+
+      <p class="meta">Ограничения / Шектеулер: 1 ≤ n ≤ 10⁵, |Aᵢ| ≤ 10⁶</p>
+
+      <h3>Формат ввода / Кіріс форматы</h3>
+      <pre><code>n
+A₁ A₂ ... Aₙ</code></pre>
+
+      <h3>Формат вывода / Шығыс форматы</h3>
+      <pre><code>Длина отрезка / Тізбектің ұзындығы</code></pre>
+
+      <h3>Примеры / Мысалдар</h3>
+      <pre><strong>Input:</strong>
+10
+1 2 3 5 4 7 11 13 15 17
+
+<strong>Output:</strong>
+3</pre>
+
+      <pre><strong>Input:</strong>
+6
+4 6 8 9 10 12
+
+<strong>Output:</strong>
+0</pre>
+    </section>
+
+    <section id="task3">
+      <h2>3. Сокращённое представление строки / Жолды қысқарту</h2>
+      <p><strong>Русский:</strong> Дана строка <code>s</code> и число <code>k</code>. Если длина строки больше <code>k</code>, выведите в виде: первый символ + (длина − 2) + последний символ. Иначе выведите строку без изменений.</p>
+      <p><strong>Қазақша:</strong> <code>s</code> жолы және <code>k</code> саны берілген. Егер жолдың ұзындығы <code>k</code>-дан үлкен болса, оны мына түрде шығарыңыз: бірінші әріп + (ұзындығы − 2) + соңғы әріп. Әйтпесе жолды өзгертпей шығарыңыз.</p>
+
+      <p class="meta">Ограничения / Шектеулер: 1 ≤ k ≤ 10⁴</p>
+
+      <h3>Формат ввода / Кіріс форматы</h3>
+      <pre><code>s
+k</code></pre>
+
+      <h3>Формат вывода / Шығыс форматы</h3>
+      <pre><code>Преобразованная строка / Қысқартылған жол</code></pre>
+
+      <h3>Примеры / Мысалдар</h3>
+      <pre><strong>Input:</strong>
+SERVER
+4
+
+<strong>Output:</strong>
+S4R</pre>
+
+      <pre><strong>Input:</strong>
+HELLO
+10
+
+<strong>Output:</strong>
+HELLO</pre>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 Набор задач / Есептер жинағы — в стиле Codeforces
+  </footer>
+</body>
+</html>

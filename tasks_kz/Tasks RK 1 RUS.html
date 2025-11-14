@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ИР-41 Промежуточный контроль 1</title>
+  <style>
+    :root{--bg:#f7fbff;--card:#ffffff;--muted:#6b7280;--accent:#0b63d6;--border:#e6eefc}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg);color:#0f172a}
+    header{background:linear-gradient(90deg,#eef6ff, #ffffff);border-bottom:1px solid var(--border);padding:20px 28px}
+    .wrap{max-width:980px;margin:28px auto;padding:0 18px}
+    h1{font-size:20px;margin:0 0 6px}
+    p.lead{margin:0;color:var(--muted)}
+    nav{margin:18px 0 28px;display:flex;gap:8px;flex-wrap:wrap}
+    .pill{background:var(--card);border:1px solid var(--border);padding:8px 12px;border-radius:12px;text-decoration:none;color:#0f172a;font-weight:600;font-size:14px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:0 6px 18px rgba(11,99,214,0.04)}
+    .meta{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .limits{font-size:13px;color:var(--muted)}
+    h2{font-size:18px;margin:6px 0 12px}
+    .section{margin-top:10px}
+    pre.sample{background:#0b1220;color:#e6f0ff;padding:12px;border-radius:8px;overflow:auto;font-family:Menlo,Monaco,monospace;font-size:13px}
+    .io-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .io-box{background:#fbfdff;border:1px solid #e6f6ff;padding:12px;border-radius:8px}
+    footer{color:var(--muted);font-size:13px;margin:28px 0}
+    @media (max-width:720px){.io-grid{grid-template-columns:1fr}nav{justify-content:flex-start}}
+    .nav-link{color:var(--accent)}
+    .example-title{font-weight:700;margin-bottom:6px}
+    code {
+      font-family: "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+      font-size: 15px;
+      background: #f1f5ff;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Промежуточный контроль — задачи</h1>
+      <p class="lead">За каждую задачу можно получить максимум 10 баллов.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <nav>
+      <a class="pill" href="#problem1">1. Архипелаг</a>
+      <a class="pill" href="#problem2">2. Самая длинная цепочка чётных чисел</a>
+      <a class="pill" href="#problem3">3. Кенгуру — лестница</a>
+    </nav>
+
+    <article id="problem1" class="card">
+      <div class="meta">
+        <div class="limits">Время: 1 с &nbsp;·&nbsp; Память: 256 Мб</div>
+      </div>
+      <h2>1. Архипелаг</h2>
+      <p>В Тихом океане расположен живописный архипелаг, состоящий из <strong>N</strong> островов. Правительство выделило средства на строительство <strong>M</strong> мостов между некоторыми парами островов. Каждый мост — двусторонний.</p>
+      <p>Министр транспорта хочет узнать: можно ли после постройки всех мостов попасть с любого острова на любой другой, двигаясь только по мостам. Если это возможно, архипелаг считается единой транспортной системой.</p>
+
+      <div class="section">
+        <strong>Формат входных данных</strong>
+        <p>В первой строке заданы два целых числа <code>N</code> и <code>M</code> (1 ≤ N ≤ 10⁵, 0 ≤ M ≤ 2·10⁵) — количество островов и мостов.
+        В следующих <code>M</code> строках заданы пары целых чисел <code>u<sub>i</sub></code> и <code>v<sub>i</sub></code> (1 ≤ u<sub>i</sub>, v<sub>i</sub> ≤ N, u<sub>i</sub> ≠ v<sub>i</sub>), обозначающие мост между островами.</p>
+
+        <strong>Формат выходных данных</strong>
+        <p>Выведите <code>YES</code>, если из любого острова можно добраться до любого другого. Иначе выведите <code>NO</code>.</p>
+
+        <div class="example-title">Пример 1</div>
+        <div class="io-grid">
+          <div class="io-box"><div class="example-title">Ввод</div>
+            <pre class="sample">4 3
+1 2
+2 3
+3 4</pre>
+          </div>
+          <div class="io-box"><div class="example-title">Вывод</div>
+            <pre class="sample">YES</pre>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="example-title">Пример 2</div>
+        <div class="io-grid">
+          <div class="io-box"><div class="example-title">Ввод</div>
+            <pre class="sample">5 3
+1 2
+1 3
+4 5</pre>
+          </div>
+          <div class="io-box"><div class="example-title">Вывод</div>
+            <pre class="sample">NO</pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article id="problem2" class="card">
+      <div class="meta">
+        <div class="limits">Время: 1 с &nbsp;·&nbsp; Память: 256 Мб</div>
+      </div>
+      <h2>2. Самая длинная цепочка чётных чисел</h2>
+      <p>Дан список целых чисел <code>A</code> длины <strong>n</strong>. Требуется найти длину самой длинной <strong>непрерывной</strong> подпоследовательности, состоящей только из чётных чисел.</p>
+
+      <div class="section">
+        <strong>Формат входных данных</strong>
+        <p>Первая строка содержит целое число <code>n</code> (1 ≤ n ≤ 2·10⁵) — длину списка. В следующей строке заданы <code>n</code> целых чисел — элементы <code>A₁ A₂ … Aₙ</code>. Для каждого |Aᵢ| ≤ 10⁹.</p>
+
+        <strong>Формат выходных данных</strong>
+        <p>Выведите длину самой длинной непрерывной последовательности чётных элементов. Если чётных чисел нет — выведите 0.</p>
+
+        <div class="example-title">Пример</div>
+        <div class="io-grid">
+          <div class="io-box"><div class="example-title">Ввод</div>
+            <pre class="sample">7
+1 2 4 6 3 8 10</pre>
+          </div>
+          <div class="io-box"><div class="example-title">Вывод</div>
+            <pre class="sample">3</pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article id="problem3" class="card">
+      <div class="meta">
+        <div class="limits">Время: 1 с &nbsp;·&nbsp; Память: 256 Мб</div>
+      </div>
+      <h2>3. Кенгуру — лестница</h2>
+      <p>Кенгуру хочет добраться до верхней ступеньки лестницы. За один прыжок он может подняться на одну или две ступеньки. Всего лестница имеет <strong>n</strong> ступенек.</p>
+
+      <div class="section">
+        <strong>Вопрос:</strong> Сколько различных способов существует, чтобы кенгуру добрался до вершины лестницы?</p>
+
+        <strong>Формат входных данных</strong>
+        <p>Одно целое число <code>n</code> (0 ≤ n ≤ 10⁶) — номер верхней ступеньки.</p>
+
+        <strong>Формат выходных данных</strong>
+        <p>Выведите количество способов добраться до вершины лестницы.</p>
+
+        <div class="example-title">Пример</div>
+        <div class="io-grid">
+          <div class="io-box"><div class="example-title">Ввод</div>
+            <pre class="sample">3</pre>
+          </div>
+          <div class="io-box"><div class="example-title">Вывод</div>
+            <pre class="sample">3</pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </main>
+</body>
+</html>

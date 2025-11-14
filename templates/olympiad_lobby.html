@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Лобби олимпиады{% endblock %}
+{% block content %}
+<div class="text-center">
+    <h2>Добро пожаловать, {{ nickname }}!</h2>
+    <p class="lead">Вы в комнате ожидания. Олимпиада начнется, как только организатор нажмет кнопку "Старт".</p>
+    <div class="spinner-border text-primary my-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <h4>Ожидаем начала...</h4>
+    <p class="text-muted">(Эта страница обновится автоматически)</p>
+</div>
+
+<div class="mt-4">
+    <h5>Подключенные участники:</h5>
+    <ul id="participants-list" class="list-group">
+        </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const olympiadId = "{{ olympiad_id }}";
+    const listEl = document.getElementById('participants-list');
+    
+    // ### ИЗМЕНЕНИЕ: Убираем setInterval ###
+    // async function checkStatus() { ... } (Удаляем всю функцию)
+    // setInterval(checkStatus, 3000); (Удаляем)
+
+    // ### ДОБАВЛЕНО: Логика Socket.IO ###
+    const socket = io();
+
+    // 1. При подключении, "входим в комнату"
+    socket.on('connect', () => {
+        console.log('Socket.IO: Подключено к серверу.');
+        socket.emit('join_room', { room: olympiadId });
+    });
+
+    // 2. Слушаем "full_status_update" (которое заменяет checkStatus)
+    socket.on('full_status_update', (data) => {
+        console.log('Socket.IO: Получено обновление статуса', data);
+        
+        if (data.status === 'running') {
+            // Олимпиада началась, переходим!
+            window.location.href = `/olympiad/run/${olympiadId}`;
+            return; // Прекращаем обработку
+        }
+
+        // Обновляем список участников
+        listEl.innerHTML = ''; // Очищаем
+        if (data.participants && data.participants.length > 0) {
+            data.participants.forEach(name => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.textContent = name;
+                listEl.appendChild(li);
+            });
+        } else {
+             listEl.innerHTML = '<li class="list-group-item">Ожидание...</li>';
+        }
+    });
+
+    // 3. Отдельно слушаем "olympiad_started" (для мгновенного редиректа)
+    socket.on('olympiad_started', (data) => {
+        console.log('Socket.IO: Олимпиада началась!');
+        window.location.href = `/olympiad/run/${olympiadId}`;
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Socket.IO: Отключено.');
+        listEl.innerHTML = '<li class="list-group-item text-danger">Потеряно соединение с сервером...</li>';
+    });
+
+</script>
+{% endblock %}

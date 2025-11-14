@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task[1] }} - Тестировщик{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('tasks_list') }}" class="btn btn-sm btn-outline-secondary mb-3">
+    <i class="bi bi-arrow-left"></i> К списку задач
+</a>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="card-title">{{ task[1] }}</h1>
+                <hr>
+                
+                {% if task[5] %}
+                <a href="{{ url_for('display_attachment', task_id=task[0]) }}" target="_blank" class="btn btn-secondary mb-3">
+                    <i class="bi bi-file-earmark-pdf"></i> Открыть условие в PDF (в новой вкладке)
+                </a>
+                {% endif %}
+
+                <h5 class="mt-3">Условие задачи</h5>
+                <p style="white-space: pre-wrap;">{{ task[4] }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                Информация
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>ID:</strong> {{ task[0] }}</li>
+                <li class="list-group-item"><strong>Сложность:</strong> {{ task[2] }}</li>
+                <li class="list-group-item"><strong>Тема:</strong> {{ task[3] or 'Не указана' }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="mt-4">
+    <h3>Примеры</h3>
+    {% if tests %}
+        {% for test in tests %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong>Пример {{ loop.index }}</strong>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Входные данные:</h6>
+                        <pre class="bg-light p-2 rounded code-area">{{ test[1] or '(пусто)' }}</pre>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Выходные данные:</h6>
+                        <pre class="bg-light p-2 rounded code-area">{{ test[2] }}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            Для этой задачи еще не добавлены примеры.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

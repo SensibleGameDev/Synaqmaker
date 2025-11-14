@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Тестировщик{% endblock %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<hr>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label">Название задачи</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{ task[1] if task else '' }}" required>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="difficulty" class="form-label">Сложность</label>
+                    <select class="form-select" id="difficulty" name="difficulty">
+                        {% set difficulty = task[2] if task else 'Лёгкий' %}
+                        <option {% if difficulty == 'Лёгкий' %}selected{% endif %}>Лёгкий</option>
+                        <option {% if difficulty == 'Средний' %}selected{% endif %}>Средний</option>
+                        <option {% if difficulty == 'Сложный' %}selected{% endif %}>Сложный</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="topic" class="form-label">Тема</label>
+                    <input type="text" class="form-control" id="topic" name="topic" value="{{ task[3] if task else '' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Описание</label>
+                <textarea class="form-control" id="description" name="description" rows="8">{{ task[4] if task else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="attachment" class="form-label">Прикрепить PDF или HTML-файл</label>
+                <input class="form-control" type="file" id="attachment" name="attachment" accept=".pdf,.html">
+                {% if task and task[5] %}
+                <div class="form-text">
+                    Текущий файл: <a href="{{ url_for('display_attachment', task_id=task[0]) }}" target="_blank">открыть прикрепленный файл</a>. Загрузка нового файла заменит старый.
+                </div>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('tasks_list') }}" class="btn btn-secondary">Отмена</a>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

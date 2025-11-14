@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бағдарламалау бойынша олимпиадалық есептер</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A tab-based navigation SPA. The top navigation bar has three tabs, one for each programming problem. Clicking a tab displays the corresponding problem's full description in the main content area, hiding the others. This structure was chosen because it allows for quick, non-linear access to each distinct problem, which is a common and effective UI pattern for platforms presenting lists of tasks or challenges. It avoids a long scroll and keeps the interface clean and focused. -->
+    <!-- Visualization & Content Choices: Report Info: Three text-based programming problems. Goal: Present problems clearly for programmers. Viz/Presentation: Each problem is presented in a styled "card" with clear typographic hierarchy using HTML and Tailwind. No charts are used as the source material is textual and doesn't contain datasets suitable for visualization. Interaction: Primary interaction is the tab navigation to switch between problems. A key secondary interaction is a 'copy to clipboard' button for each example's input data, improving usability for the target audience. Justification: This approach prioritizes readability and user efficiency, which are key for a programming challenge platform. Library/Method: Vanilla JS for tab switching and clipboard interaction. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            color: #1d4ed8;
+            border-color: #1d4ed8;
+            background-color: #eff6ff;
+        }
+        .problem-content {
+            display: none;
+        }
+        .problem-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Олимпиадалық есептер</h1>
+            <p class="text-slate-600 mt-2 text-lg">Codeforces стиліндегі интерактивті есептер жинағы</p>
+        </header>
+
+        <div class="max-w-5xl mx-auto">
+            <nav class="mb-8 p-1.5 bg-slate-200 rounded-xl flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2" aria-label="Tabs">
+                <button data-tab="problem-a" class="tab-btn w-full sm:w-auto active text-slate-700 font-semibold py-2.5 px-6 rounded-lg border-b-4 border-transparent hover:bg-slate-300">
+                    A. Генетикалық мутация
+                </button>
+                <button data-tab="problem-b" class="tab-btn w-full sm:w-auto text-slate-700 font-semibold py-2.5 px-6 rounded-lg border-b-4 border-transparent hover:bg-slate-300">
+                    B. Құпия кілт
+                </button>
+                <button data-tab="problem-c" class="tab-btn w-full sm:w-auto text-slate-700 font-semibold py-2.5 px-6 rounded-lg border-b-4 border-transparent hover:bg-slate-300">
+                    C. Архипелаг
+                </button>
+            </nav>
+
+            <main>
+                <div id="problem-a" class="problem-content active">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                        <div class="flex flex-wrap justify-between items-baseline mb-4">
+                            <h2 class="text-3xl font-bold text-slate-900 mb-2">A. Генетикалық мутация</h2>
+                            <div class="flex space-x-4 text-sm">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">Уақыты: 2с</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">Жады: 256Мб</span>
+                            </div>
+                        </div>
+                        <div class="prose max-w-none prose-slate">
+                            <h3>Аңыз</h3>
+                            <p>Жас биоинформатик Алексей вирустардың эволюциясын зерттейді. Ол әрбір вирустың геномын бас латын әріптерінен тұратын жол ретінде ұсынады. Алексейдің ойынша, егер бір вирустың геномын екінші вирустың геномына үш қарапайым операция арқылы түрлендіру мүмкін болса, онда ол мутацияға ұшыраған болуы мүмкін:</p>
+                            <ol>
+                                <li><strong>Бір таңбаны кірістіру.</strong></li>
+                                <li><strong>Бір таңбаны жою.</strong></li>
+                                <li><strong>Бір таңбаны басқасына ауыстыру.</strong></li>
+                            </ol>
+                            <p>Алексей екі вирус арасындағы "эволюциялық қашықтықты" тапқысы келеді — яғни бір вирустың геномын екіншісіне түрлендіру үшін қажетті осындай операциялардың ең аз санын. Оған осы процесті автоматтандыру үшін бағдарлама жазуға көмектесіңіз.</p>
+                            
+                            <h3>Енгізу форматы</h3>
+                            <p>Екі жолда екі бос емес геном берілген — бас латын әріптерінен тұратын S1 және S2 жолдары.</p>
+                            
+                            <h3>Шығару форматы</h3>
+                            <p>S1 жолын S2-ге түрлендіру үшін операциялардың ең аз санын (Левенштейн қашықтығы) — бір бүтін санды шығарыңыз.</p>
+                            
+                            <h3>Шектеулер</h3>
+                            <ul class="list-disc pl-5">
+                                <li>Әр жолдың ұзындығы 1-ден 5000 таңбаға дейін.</li>
+                            </ul>
+
+                            <h3>Мысалдар</h3>
+                            <div class="space-y-4">
+                                <div class="bg-slate-100 rounded-lg p-4">
+                                    <div class="flex justify-between items-start">
+                                        <div class="w-1/2 pr-2">
+                                            <h4 class="font-semibold text-slate-600 mb-2">Енгізу</h4>
+                                            <pre class="mono bg-white p-3 rounded text-sm whitespace-pre-wrap" id="input1">KITTEN
+SITTING</pre>
+                                        </div>
+                                        <div class="w-1/2 pl-2">
+                                            <h4 class="font-semibold text-slate-600 mb-2">Шығару</h4>
+                                            <pre class="mono bg-white p-3 rounded text-sm">3</pre>
+                                        </div>
+                                    </div>
+                                    <button class="copy-btn mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium" data-target="input1">Енгізуді көшіру</button>
+                                </div>
+                                <div class="bg-slate-100 rounded-lg p-4">
+                                     <div class="flex justify-between items-start">
+                                        <div class="w-1/2 pr-2">
+                                            <h4 class="font-semibold text-slate-600 mb-2">Енгізу</h4>
+                                            <pre class="mono bg-white p-3 rounded text-sm whitespace-pre-wrap" id="input2">FLAW
+LAWN</pre>
+                                        </div>
+                                        <div class="w-1/2 pl-2">
+                                            <h4 class="font-semibold text-slate-600 mb-2">Шығару</h4>
+                                            <pre class="mono bg-white p-3 rounded text-sm">2</pre>
+                                        </div>
+                                    </div>
+                                    <button class="copy-btn mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium" data-target="input2">Енгізуді көшіру</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="problem-b" class="problem-content">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                        <div class="flex flex-wrap justify-between items-baseline mb-4">
+                            <h2 class="text-3xl font-bold text-slate-900 mb-2">B. Құпия кілт</h2>
+                             <div class="flex space-x-4 text-sm">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">Уақыты: 1с</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">Жады: 256Мб</span>
+                            </div>
+                        </div>
+                        <div class="prose max-w-none prose-slate">
+                            <h3>Аңыз</h3>
+                            <p>Арнайы агент Ева жау хабарламаларын шифрлау үшін қолданылатын сандық кілттер сериясын ұстап алды. Шифрлау жүйесі тек <strong>жай сандармен</strong> іске қосылатыны белгілі. Егер кілт жай сан болмаса, ол жалған деп есептеліп, еленбейді.</p>
+                            <p>Кілттер өте үлкен болуы мүмкін, сондықтан қолмен тексеру немесе қарапайым алгоритмдер тым көп уақыт алады. Сіздің міндетіңіз — ұсталған кілттердің қайсысы жай сан екенін тез анықтау, осылайша Ева шынымен маңызды деректерге назар аудара алады.</p>
+                            
+                            <h3>Енгізу форматы</h3>
+                            <p>Бірінші жолда бір бүтін сан T берілген — ұсталған кілттердің саны. Келесі T жолда бір-бірден N бүтін саны берілген.</p>
+                            
+                            <h3>Шығару форматы</h3>
+                            <p>Әрбір N саны үшін, егер сан жай болса, жаңа жолда `YES` деп, керісінше жағдайда `NO` деп шығарыңыз.</p>
+
+                            <h3>Шектеулер</h3>
+                             <ul class="list-disc pl-5">
+                                <li>1 ≤ T ≤ 100</li>
+                                <li>1 ≤ N ≤ 10<sup>18</sup></li>
+                            </ul>
+                            
+                             <h3>Мысалдар</h3>
+                             <div class="bg-slate-100 rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div class="w-1/2 pr-2">
+                                        <h4 class="font-semibold text-slate-600 mb-2">Енгізу</h4>
+                                        <pre class="mono bg-white p-3 rounded text-sm whitespace-pre-wrap" id="input3">4
+7
+13
+1
+998244353</pre>
+                                    </div>
+                                    <div class="w-1/2 pl-2">
+                                        <h4 class="font-semibold text-slate-600 mb-2">Шығару</h4>
+                                        <pre class="mono bg-white p-3 rounded text-sm whitespace-pre-wrap">YES
+YES
+NO
+YES</pre>
+                                    </div>
+                                </div>
+                                <button class="copy-btn mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium" data-target="input3">Енгізуді көшіру</button>
+                            </div>
+                             <p class="text-sm text-slate-600 mt-4"><strong>Ескерту:</strong> 1 саны жай сан да, құрама сан да емес. Осы есеп аясында ол жай емес деп есептеледі.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="problem-c" class="problem-content">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                        <div class="flex flex-wrap justify-between items-baseline mb-4">
+                            <h2 class="text-3xl font-bold text-slate-900 mb-2">C. Архипелаг</h2>
+                            <div class="flex space-x-4 text-sm">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">Уақыты: 1с</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">Жады: 256Мб</span>
+                            </div>
+                        </div>
+                        <div class="prose max-w-none prose-slate">
+                            <h3>Аңыз</h3>
+                            <p>Тынық мұхитында N аралдан тұратын көрікті архипелаг орналасқан. Жақында үкімет кейбір аралдар жұптарының арасына M көпір салуға қаражат бөлді. Енді көлік министрін барлық көпірлер салынғаннан кейін архипелагтың кез келген аралынан кез келген басқа аралға тек көпірлер арқылы жетуге бола ма деген сұрақ қызықтырады. Егер бұл мүмкін болса, онда архипелагты біртұтас көлік жүйесі деп атауға болады.</p>
+                            <p>Сізге, министрліктің бас бағдарламашысы ретінде, осы маңызды сұраққа жауап беру тапсырылды.</p>
+                            
+                            <h3>Енгізу форматы</h3>
+                            <p>Бірінші жолда екі бүтін сан N және M берілген — аралдар саны мен көпірлер саны. Аралдар 1-ден N-ге дейін нөмірленген. Келесі M жолда ui және vi бүтін сандар жұптары берілген, бұл ui және vi аралдары арасында екіжақты көпір салынғанын білдіреді.</p>
+                            
+                            <h3>Шығару форматы</h3>
+                            <p>Егер кез келген аралдан кез келген басқа аралға жетуге болса, `YES` деп шығарыңыз. Керісінше жағдайда `NO` деп шығарыңыз.</p>
+
+                            <h3>Шектеулер</h3>
+                             <ul class="list-disc pl-5">
+                                <li>1 ≤ N ≤ 10<sup>5</sup></li>
+                                <li>0 ≤ M ≤ 2 ⋅ 10<sup>5</sup></li>
+                                <li>1 ≤ ui, vi ≤ N, ui ≠ vi</li>
+                            </ul>
+                            
+                            <h3>Мысалдар</h3>
+                            <div class="space-y-4">
+                                <div class="bg-slate-100 rounded-lg p-4">
+                                    <div class="flex justify-between items-start">
+                                        <div class="w-1/2 pr-2">
+                                            <h4 class="font-semibold text-slate-600 mb-2">Енгізу</h4>
+                                            <pre class="mono bg-white p-3 rounded text-sm whitespace-pre-wrap" id="input4">4 3
+1 2
+2 3
+3 4</pre>
+                                        </div>
+                                        <div class="w-1/2 pl-2">
+                                            <h4 class="font-semibold text-slate-600 mb-2">Шығару</h4>
+                                            <pre class="mono bg-white p-3 rounded text-sm">YES</pre>
+                                        </div>
+                                    </div>
+                                    <button class="copy-btn mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium" data-target="input4">Енгізуді көшіру</button>
+                                </div>
+                                <div class="bg-slate-100 rounded-lg p-4">
+                                     <div class="flex justify-between items-start">
+                                        <div class="w-1/2 pr-2">
+                                            <h4 class="font-semibold text-slate-600 mb-2">Енгізу</h4>
+                                            <pre class="mono bg-white p-3 rounded text-sm whitespace-pre-wrap" id="input5">5 3
+1 2
+1 3
+4 5</pre>
+                                        </div>
+                                        <div class="w-1/2 pl-2">
+                                            <h4 class="font-semibold text-slate-600 mb-2">Шығару</h4>
+                                            <pre class="mono bg-white p-3 rounded text-sm">NO</pre>
+                                        </div>
+                                    </div>
+                                    <button class="copy-btn mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium" data-target="input5">Енгізуді көшіру</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.problem-content');
+            const copyButtons = document.querySelectorAll('.copy-btn');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetId = tab.dataset.tab;
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    contents.forEach(content => {
+                        if (content.id === targetId) {
+                            content.classList.add('active');
+                        } else {
+                            content.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            copyButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        const textToCopy = targetElement.innerText;
+                        
+                        const textArea = document.createElement('textarea');
+                        textArea.value = textToCopy;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            const originalText = button.innerText;
+                            button.innerText = 'Көшірілді!';
+                            setTimeout(() => {
+                                button.innerText = originalText;
+                            }, 2000);
+                        } catch (err) {
+                            console.error('Не удалось скопировать текст: ', err);
+                        }
+                        document.body.removeChild(textArea);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

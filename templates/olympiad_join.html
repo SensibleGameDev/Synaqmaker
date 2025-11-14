@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Присоединиться к олимпиаде{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h4>Вход для участников</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="join-form">
+                    <div class="mb-3">
+                        <label for="olympiad_id" class="form-label">ID Олимпиады</label>
+                        <input type="text" class="form-control" id="olympiad_id" name="olympiad_id" required placeholder="Например, 1234abcd">
+                    </div>
+                    <div class="mb-3">
+                        <label for="nickname" class="form-label">Ваш никнейм</label>
+                        <input type="text" class="form-control" id="nickname" name="nickname" required>
+                    </div>
+                    
+                    <div class="mb-3 d-none" id="password-field">
+                        <label for="password" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                        <div class="form-text text-danger">Это закрытая олимпиада. Требуется пароль.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Войти в лобби</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const olyIdInput = document.getElementById('olympiad_id');
+    const passwordField = document.getElementById('password-field');
+    const passwordInput = document.getElementById('password');
+
+    let fetchTimer;
+
+    olyIdInput.addEventListener('input', () => {
+        // Очищаем таймер, если пользователь продолжает вводить
+        clearTimeout(fetchTimer);
+
+        const olyId = olyIdInput.value.trim();
+        
+        // (Мы ожидаем ID из 8 символов, как в app.py)
+        if (olyId.length >= 8) {
+            // Устанавливаем таймер, чтобы не слать запрос на каждую букву
+            fetchTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/olympiad/mode/${olyId}`);
+                    if (!response.ok) {
+                        // Олимпиада не найдена, прячем поле
+                        passwordField.classList.add('d-none');
+                        passwordInput.required = false;
+                        return;
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.mode === 'closed') {
+                        passwordField.classList.remove('d-none');
+                        passwordInput.required = true;
+                    } else {
+                        passwordField.classList.add('d-none');
+                        passwordInput.required = false;
+                    }
+
+                } catch (error) {
+                    console.error("Ошибка при проверке режима олимпиады:", error);
+                    passwordField.classList.add('d-none');
+                    passwordInput.required = false;
+                }
+            }, 500); // Задержка в полсекунды
+        } else {
+            // Если ID слишком короткий, поле всегда скрыто
+            passwordField.classList.add('d-none');
+            passwordInput.required = false;
+        }
+    });
+});
+</script>
+{% endblock %}

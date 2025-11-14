@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Проверка решений - Synaqmaker{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h4 class="mb-0">Проверка решений</h4>
+    </div>
+    <div class="card-body">
+        <form id="submission-form">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="task_id" class="form-label">Задача:</label>
+                    <select id="task_id" name="task_id" class="form-select" required>
+                        <option value="" disabled selected>-- Выберите задачу --</option>
+                        {% for task in tasks %}
+                        <option value="{{ task[0] }}">{{ task[1] }} ({{ task[2] }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="language" class="form-label">Язык:</label>
+                    <select id="language" name="language" class="form-select">
+                        <option>Python</option>
+                        <option>C++</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label for="code" class="form-label">Код:</label>
+                    <textarea id="code" name="code" class="form-control" rows="15" placeholder="Введите ваш код здесь..."></textarea>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="submit" class="btn btn-primary px-4">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="spinner"></span>
+                    <i class="bi bi-play-fill me-1"></i>
+                    Запустить проверку
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="results-container" class="mt-4">
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

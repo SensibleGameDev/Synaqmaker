@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ИР-41 Аралық бақылау 1</title>
+  <style>
+    :root{--bg:#f7fbff;--card:#ffffff;--muted:#6b7280;--accent:#0b63d6;--border:#e6eefc}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg);color:#0f172a}
+    header{background:linear-gradient(90deg,#eef6ff, #ffffff);border-bottom:1px solid var(--border);padding:20px 28px}
+    .wrap{max-width:980px;margin:28px auto;padding:0 18px}
+    h1{font-size:20px;margin:0 0 6px}
+    p.lead{margin:0;color:var(--muted)}
+    nav{margin:18px 0 28px;display:flex;gap:8px;flex-wrap:wrap}
+    .pill{background:var(--card);border:1px solid var(--border);padding:8px 12px;border-radius:12px;text-decoration:none;color:#0f172a;font-weight:600;font-size:14px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:0 6px 18px rgba(11,99,214,0.04)}
+    .meta{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .limits{font-size:13px;color:var(--muted)}
+    h2{font-size:18px;margin:6px 0 12px}
+    .section{margin-top:10px}
+    pre.sample{background:#0b1220;color:#e6f0ff;padding:12px;border-radius:8px;overflow:auto;font-family:Menlo,Monaco,monospace;font-size:13px}
+    .io-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .io-box{background:#fbfdff;border:1px solid #e6f6ff;padding:12px;border-radius:8px}
+    footer{color:var(--muted);font-size:13px;margin:28px 0}
+    @media (max-width:720px){.io-grid{grid-template-columns:1fr}nav{justify-content:flex-start}}
+    .nav-link{color:var(--accent)}
+    .example-title{font-weight:700;margin-bottom:6px}
+    code {
+    font-family: "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+    font-size: 15px;
+    background: #f1f5ff;
+    padding: 2px 4px;
+    border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Аралық бақылау есептері</h1>
+      <p class="lead">Әр есеп үшін максимум 10 балл беріледі.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <nav>
+      <a class="pill" href="#problem1">1. Архипелаг</a>
+      <a class="pill" href="#problem2">2. Ең ұзын жұп сандар тізбегі</a>
+      <a class="pill" href="#problem3">3. Кенгуру — баспалдақ</a>
+    </nav>
+
+    <article id="problem1" class="card">
+      <div class="meta">
+        <div class="limits">Уақыты: 1 с &nbsp;·&nbsp; Жады: 256 Мб</div>
+      </div>
+      <h2>1. Архипелаг</h2>
+      <p>Тынық мұхитында <strong>N</strong> аралдан тұратын көрікті архипелаг орналасқан. Үкімет кейбір аралдар жұптарының арасына <strong>M</strong> көпір салуға қаражат бөлді. Әр көпір — екіжақты (яғни екеуара жүре алады).</p>
+      <p>Көпірлер салынғаннан кейін архипелагтың кез келген аралынан кез келген басқа аралға тек көпірлер арқылы жетуге бола ма — соны анықтау қажет. Егер солай болса, архипелагты біртұтас көлік жүйесі деп атауға болады.</p>
+
+      <div class="section">
+        <strong>Енгізу форматы</strong>
+        <p>Бірінші жолда екі бүтін сан <code>N</code> және <code>M</code> (1 ≤ N ≤ 10⁵, 0 ≤ M ≤ 2·10⁵) берілген — аралдар саны және көпірлер саны.
+        Келесі <code>M</code> жолда <code>u<sub>i</sub></code> және <code>v<sub>i</sub></code> (1 ≤ u<sub>i</sub>, v<sub>i</sub> ≤ N, u<sub>i</sub> ≠ v<sub>i</sub>) бүтін сандар жұптары беріледі — сәйкес аралдар арасында көпір бар.</p>
+
+        <strong>Шығару форматы</strong>
+        <p>Егер әрбір аралдан әрбір аралға көпірлер арқылы жетуге болса — шығару <code>YES</code>. Әйтпесе — <code>NO</code>.</p>
+
+        <strong>Шектеулер</strong>
+        <ul>
+          <li>N ≤ 10⁵, M ≤ 2·10⁵</li>
+          <li>Уақыт шегі: 1 секунд, жад: 256 Мб</li>
+        </ul>
+
+        <div class="example-title">Мысал 1</div>
+        <div class="io-grid">
+          <div class="io-box"><div class="example-title">Енгізу</div>
+            <pre class="sample">4 3
+1 2
+2 3
+3 4</pre>
+          </div>
+          <div class="io-box"><div class="example-title">Шығару</div>
+            <pre class="sample">YES</pre>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="example-title">Мысал 2</div>
+        <div class="io-grid">
+          <div class="io-box"><div class="example-title">Енгізу</div>
+            <pre class="sample">5 3
+1 2
+1 3
+4 5</pre>
+          </div>
+          <div class="io-box"><div class="example-title">Шығару</div>
+            <pre class="sample">NO</pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article id="problem2" class="card">
+      <div class="meta">
+        <div class="limits">Уақыты: 1 с &nbsp;·&nbsp; Жады: 256 Мб</div>
+      </div>
+      <h2>2. Ең ұзын жұп сандар тізбегі</h2>
+      <p>Сізге ұзындығы <strong>n</strong> болатын бүтін сандардың <code>A</code> тізімі берілген. Тізімдегі <em>жұп</em> сандардан ғана тұратын ең ұзын <strong>үздіксіз</strong> тізбектің ұзындығын анықтаңыз.</p>
+
+      <div class="section">
+        <strong>Енгізу форматы</strong>
+        <p>Бірінші жолда бір бүтін сан <code>n</code> (1 ≤ n ≤ 2·10⁵) — тізімнің ұзындығы. Келесі жолда <code>n</code> бүтін сан — элементтер: <code>A₁ A₂ … Aₙ</code>. Әрбір элементтің шамасы |Aᵢ| ≤ 10⁹.</p>
+
+        <strong>Шығару форматы</strong>
+        <p>Жауап ретінде ең ұзын үздіксіз жұп элементтерден тұратын тізбектің ұзындығын шығарыңыз. Егер жұп сан жоқ болса — 0 шығарыңыз.</p>
+
+        <strong>Шектеулер</strong>
+        <ul>
+          <li>n ≤ 2·10⁵</li>
+          <li>Уақыт шегі: 1 секунд, жад: 256 Мб</li>
+        </ul>
+
+        <div class="example-title">Мысал</div>
+        <div class="io-grid">
+          <div class="io-box"><div class="example-title">Енгізу</div>
+            <pre class="sample">7
+1 2 4 6 3 8 10</pre>
+          </div>
+          <div class="io-box"><div class="example-title">Шығару</div>
+            <pre class="sample">3</pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article id="problem3" class="card">
+      <div class="meta">
+        <div class="limits">Уақыты: 1 с &nbsp;·&nbsp; Жады: 256 Мб</div>
+      </div>
+      <h2>3. Кенгуру — баспалдақ</h2>
+      <p>Кенгуру баспалдақтың ең жоғары сатысына секіргісі келеді. Ол бір қадамда не бір саты (1) не екі саты (2) секіре алады. Баспалдақтың ең жоғарғы сатысы <strong>n</strong>-ге тең.</p>
+
+      <div class="section">
+        <strong>Сұрақ:</strong> Кенгуру баспалдақтың жоғарғы сатысына жетудің неше түрлі тәсілі бар?</p>
+
+        <strong>Енгізу форматы</strong>
+        <p>Бір бүтін сан <code>n</code> (0 ≤ n ≤ 10⁶) — баспалдақтың жоғарғы сатысы.</p>
+
+        <strong>Шығару форматы</strong>
+        <p>Баспалдақтың жоғарғы сатысына жету тәсілдерінің санын шығарыңыз.</p>
+
+        <strong>Шектеулер</strong>
+        <ul>
+          <li>n ≤ 10⁶</li>
+          <li>Уақыт шегі: 1 секунд, жад: 256 Мб</li>
+        </ul>
+
+        <div class="example-title">Мысал</div>
+        <div class="io-grid">
+          <div class="io-box"><div class="example-title">Енгізу</div>
+            <pre class="sample">3</pre>
+          </div>
+          <div class="io-box"><div class="example-title">Шығару</div>
+            <pre class="sample">3</pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </main>
+</body>
+</html>

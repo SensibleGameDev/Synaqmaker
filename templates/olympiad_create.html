@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Настройка Олимпиады{% endblock %}
+{% block content %}
+<h2>Настройка олимпиады</h2>
+<p>Выберите задачи, время, систему оценки и режим доступа.</p>
+<hr>
+<form method="POST" id="create-olympiad-form">
+    <div class="card mb-4">
+        <div class="card-header">1. Выбор задач (<span id="task-counter">0</span>/10)</div>
+        <div class="card-body">
+            
+            <div class="mb-3">
+                <input type="text" id="task-search" class="form-control" placeholder="Поиск по названию задачи...">
+            </div>
+            <p class="text-muted">Выберите от 1 до 10 задач из списка:</p>
+            
+            <div class="row" id="task-list-container">
+            {% for task in tasks %}
+                <div class="col-md-4 task-item"> 
+                    <div class="form-check">
+                        <input class="form-check-input task-checkbox" type="checkbox" name="task_ids" value="{{ task[0] }}" id="task-{{ task[0] }}">
+                        <label class="form-check-label" for="task-{{ task[0] }}">
+                            {{ task[1] }} ({{ task[2] }})
+                        </label>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">2. Время проведения</div>
+        <div class="card-body">
+            <label for="duration" class="form-label">Длительность (от 1 до 300 минут):</label>
+            <input type="number" class="form-control" id="duration" name="duration" min="1" max="300" value="120" required>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">3. Система оценки</div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="scoring" id="scoring-all" value="all_or_nothing" checked>
+                <label class="form-check-label" for="scoring-all">
+                    <strong>"Всё или ничего"</strong>: 100 баллов за полностью решенную задачу.
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="scoring" id="scoring-test" value="per_test">
+                <label class="form-check-label" for="scoring-test">
+                    <strong>Баллы за тесты</strong>: Количество баллов равно количеству пройденных тестов.
+                </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="scoring" id="scoring-icpc" value="icpc">
+                <label class="form-check-label" for="scoring-icpc">
+                    <strong>ICPC (Классический)</strong>: 1 балл за решенную задачу + 20 минут штрафа за неверную попытку.
+                </label>
+            </div>
+            </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">4. Режим доступа</div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="mode" id="mode-free" value="free" checked>
+                <label class="form-check-label" for="mode-free">
+                    <strong>Свободный</strong>: Любой участник может войти, указав свой никнейм и ID олимпиады.
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="mode" id="mode-closed" value="closed">
+                <label class="form-check-label" for="mode-closed">
+                    <strong>Закрытый</strong>: Только участники из "белого списка" (никнейм + пароль) могут войти.
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <button type="submit" id="submit-btn" class="btn btn-success btn-lg">Создать олимпиаду!</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Код для счетчика задач (остается без изменений) ---
+    const checkboxes = document.querySelectorAll('.task-checkbox');
+    const counter = document.getElementById('task-counter');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function updateCounter() {
+        const checkedCount = document.querySelectorAll('.task-checkbox:checked').length;
+        counter.textContent = checkedCount;
+
+        if (checkedCount >= 1 && checkedCount <= 10) {
+            submitBtn.disabled = false;
+            counter.classList.remove('text-danger');
+        } else {
+            submitBtn.disabled = true;
+            counter.classList.add('text-danger');
+        }
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateCounter);
+    });
+
+    updateCounter();
+    
+    // --- "ЖИВОЙ" ПОИСК В СПИСКЕ ЗАДАЧ (остается без изменений) ---
+    const searchInput = document.getElementById('task-search');
+    const taskItems = document.querySelectorAll('#task-list-container .task-item');
+
+    searchInput.addEventListener('keyup', () => {
+        const filter = searchInput.value.toLowerCase();
+
+        taskItems.forEach(item => {
+            const label = item.querySelector('.form-check-label');
+            if (label) {
+                const title = label.textContent.toLowerCase();
+                if (title.includes(filter)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
